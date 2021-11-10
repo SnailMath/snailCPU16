@@ -21,14 +21,14 @@ Or initialize the stack pointer to 3F00 and use 3F00 to 3FFF (256 words) for con
 You'll need global values, because there is no direct add or mov, you'll have to put values like 1 and -1 here...
 
 ## Instructions:
-| hex            | asm          | pseudocode       | info |
-| ---            | ---          | ---              | --- |
-| `0000xxxxyyyy` | `mov x, y`   | [y] := [x]       | |
-| `0001xxxxyyyy` | `add x, y`   | [y] := [x] + [y] | overflow sets Flag, Flag otherwise cleared. |
-| `0002xxxxyyyy` | `xor x, y`   | [y] := [x] ^ [y] | |
-| `0003xxxxyyyy` | `and x, y`   | [y] := [x] & [y] | |
-| `0004xxxxyyyy` | `shift x, y` | [y] := [y]<<[x]  | the last bit will be put into Flag. If [x] is negative, perform a shift right instead. |
-| `0005xxxxyyyy` | `mif x y`    | [y] := [x]       | move-if (move only if Flag is set)  |
+| hex            | asm        | pseudocode       | info |
+| ---            | ---        | ---              | --- |
+| `0000xxxxyyyy` | `mov x, y` | [x]       -> [y] | |
+| `0001xxxxyyyy` | `add x, y` | [x] + [y] -> [y] | overflow sets Flag, Flag otherwise cleared. |
+| `0002xxxxyyyy` | `xor x, y` | [x] ^ [y] -> [y] | |
+| `0003xxxxyyyy` | `and x, y` | [x] & [y] -> [y] | |
+| `0004xxxxyyyy` | `sft x, y` | [y]<<[x]  -> [y] | (or `shift x, y`) the last bit will be put into Flag. If [x] is negative, perform a shift right instead. |
+| `0005xxxxyyyy` | `mif x, y` | [x]       -> [y] | move-if (move only if Flag is set)  |
 
 ## Your are missing the Instruction (insert instruction here)! What to I do?
 
