@@ -10,6 +10,7 @@
 #define ADDR_PC    0
 #define ADDR_PORT  1
 #define ADDR_DEBUG 2
+#define ADDR_QUIT  3
 
 #define CMD_MOV   0
 #define CMD_ADD   1
@@ -24,6 +25,7 @@ class cpu {
 public:
 	uint16_t pc = PROG_START;
 	bool flag = false;
+	bool running = true;
 	uint16_t memory[RAM_SIZE];
 	void init(){
 		//clear the ram
@@ -67,6 +69,9 @@ public:
 			case ADDR_DEBUG: //output to the port(aka screen)
 				printf("%04X\n", val);
 			break;
+			case ADDR_QUIT: //stop the execution
+				running = false;
+			break;
 		}	
 		
 	}
@@ -87,7 +92,7 @@ public:
 		return(memory[address]);
 	}
 	void step(int s){
-		for(;s>0;s--){
+		for(;s>0&&running;s--){
 #ifdef DEBUG
 		printf("Executing 1 cycle...\n");
 #endif
@@ -145,10 +150,15 @@ public:
 
 
 
-int main(){
+int main(int argc, char* argv[]){
+	if(argc!=2){
+		printf("Usage: %s program.bin\n(The program is loaded from 0x%04X onwards.)", argv[0], PROG_START); return(-1);
+	}
 	cpu c; //Create cpu object
 	c.init(); //Init the cpu
-	c.load("file.bin",MODE_BIG_ENDIAN);
-	c.step(7);
+	c.load(argv[1],MODE_BIG_ENDIAN);
+	while(c.running){
+		c.step(1);
+	}
     
 }
