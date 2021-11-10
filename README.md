@@ -22,7 +22,7 @@ You'll need global values, because there is no direct add or mov, you'll have to
 
 ## Instructions:
 | hex            | asm        | pseudocode       | F | info |
-| ---            | ---        | ---              |   | --- |
+| ---            | ---        | ---              |---| --- |
 | `0000xxxxyyyy` | `mov x, y` | [x]       -> [y] |   | |
 | `0001xxxxyyyy` | `add x, y` | [x] + [y] -> [y] | X | overflow sets Flag, Flag otherwise cleared. |
 | `0002xxxxyyyy` | `xor x, y` | [x] ^ [y] -> [y] |   | |
