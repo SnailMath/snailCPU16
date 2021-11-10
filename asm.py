@@ -37,7 +37,7 @@ def handleArg(index, tokens):
         if tokens[index]=="," or tokens[index]=="#":
             loop=False
         elif tokens[index]=="$":
-            arg.append(dollarsign+ENTRY_POINT)
+            arg.append(str(dollarsign+ENTRY_POINT))
         else:
             arg.append(tokens[index])
         index+=1 
@@ -206,7 +206,7 @@ for entry in offsets:
             try:
                 thisvalue = int(tokens[i],0)
                 if(DEBUG):
-                    print(f"Token {tokens[i]} is a number")
+                    print(f"Token {tokens[i]} is a number (converted from string)")
             except:
                 thisvalue = 0;
                 print(f"Error near line {int(address/3)}: Token '{tokens[i]}' is not a valid number!")
