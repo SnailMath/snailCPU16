@@ -94,7 +94,7 @@ for line in lines:
             if tokens[1] in equs:
                 print(f"Error in line {line_nr}: Multiple occurrances of lable or .equ \"{tokens[1]}\"")
             try:
-                value = int(tokens[2])
+                value = int(tokens[2],0)
             except:
                 print(f"Error in line {line_nr}: '{tokens[2]}' is not a valid number. (Note: don't use lables or equs here.)")
                 value = 0
@@ -204,18 +204,18 @@ for entry in offsets:
                 value += equs[tokens[i]]
         else: #Token must be a number
             try:
-                thisvalue = int(tokens[i])
+                thisvalue = int(tokens[i],0)
                 if(DEBUG):
                     print(f"Token {tokens[i]} is a number")
             except:
                 thisvalue = 0;
                 print(f"Error near line {int(address/3)}: Token '{tokens[i]}' is not a valid number!")
             if mode=="mul":
-                value *= int(thisvalue)
+                value *= thisvalue
             elif mode=="sub":
-                value -= int(thisvalue)
+                value -= thisvalue
             else:
-                value += int(thisvalue) 
+                value += thisvalue
         i+=1
     if(DEBUG):
         print(f"The offset at {address} was evaluated to {value}")
