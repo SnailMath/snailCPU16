@@ -48,10 +48,15 @@ public:
 			}else{//big endian
 				memory[index] = c1<<8 | c2 ;
 			}
+#ifdef DEBUG
 			printf("%04X ", memory[index]);
+#endif
 			index++;
 		}
-		printf("\nLoaded %d words from 0x%04X to 0x%04X\n", (int)index-PROG_START, PROG_START, (unsigned int)index);
+#ifdef DEBUG
+		print("\n");
+#endif
+		printf("Loaded %d words from 0x%04X to 0x%04X\n", (int)index-PROG_START, PROG_START, (unsigned int)index);
 		fclose(fp);
 	}
 	void write(uint16_t address, uint16_t val){
