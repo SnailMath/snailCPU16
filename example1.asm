@@ -62,7 +62,14 @@ print: #print string from r1
 	mov   , 0    # jump back
 
 	
+ptint_int: #print int from r1
+	.word $+1
+	
 
+	#return
+	mov sp, $+7  # load stack value from the stack into the mov ,0 command
+	add p1, sp   # increment stack back up
+	mov   , 0    # jump back
 
 defaultsp: #the default value for the stack pointer
 	.word 0x4000

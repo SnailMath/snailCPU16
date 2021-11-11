@@ -21,16 +21,16 @@ Or initialize the stack pointer to 3F00 and use 3F00 to 3FFF (256 words) for con
 You'll need global values, because there is no direct add or mov, you'll have to put values like 1 and -1 here...
 
 ## Instructions:
-| hex            | asm        | pseudocode       | F | info |
-| ---            | ---        | ---              |---| --- |
-| `0000xxxxyyyy` | `mov x , y` | [x]       -> [y] |   | |
-| `0001xxxxyyyy` | `add x , y` | [x] + [y] -> [y] | X | overflow sets Flag, Flag otherwise cleared. |
-| `0002xxxxyyyy` | `xor x , y` | [x] ^ [y] -> [y] |   | |
-| `0003xxxxyyyy` | `and x , y` | [x] & [y] -> [y] |   | |
-| `0004xxxxyyyy` | `sft x , y` | [y]<<[x]  -> [y] | X | (`shift x, y`) if [x]>0: shift left else shift right, last bit put into F |
-| `0005xxxxyyyy` | `mif x , y` | [x]       -> [y] |   | move-if (move only if Flag is set)  |
+| hex            | asm        | pseudocode       | info |
+| ---            | ---        | ---              | --- |
+| `0000xxxxyyyy` | `mov x, y` | [x]       -> [y] | |
+| `0001xxxxyyyy` | `add x, y` | [x] + [y] -> [y] | overflow sets Flag, Flag otherwise cleared. |
+| `0002xxxxyyyy` | `xor x, y` | [x] ^ [y] -> [y] | |
+| `0003xxxxyyyy` | `and x, y` | [x] & [y] -> [y] | |
+| `0004xxxxyyyy` | `sft x, y` | [y]<<[x]  -> [y] | (`shift x, y`) shift left (right if x<0), last bit -> F |
+| `0005xxxxyyyy` | `mif x, y` | [x]       -> [y] | move-if (move only if Flag is set)  |
 
-## Your are missing the Instruction (insert instruction here)! What to I do?
+## I need the Instruction (insert instruction here)! But it's missing! What should I do?
 
 Everything should work with these instructions.
 
@@ -89,10 +89,10 @@ The assembler is a python script that converts assembly files into machine code.
 - `.equ x y` sets the constant x to value y
 - `.string "x"` an actual string
 - `.word x` a one word value in the code
-- `abc:` a lable (can be used in commands)
-- `abc x, y` a command (must be one of the 6 in the hardware specs), x any y are values like this:
+- `abc:` a lable (can be used as an argument for commands)
+- `amov x, y` a command (must be one of the 6 in the hardware specs), x any y are values like this:
 	- a number (decimal, binary or hexadecimal)
-	- a consstant, lable or a '$' (current location)
+	- a constant, lable or a '$' (current location)
 	- a calculation using numbers and lables with the operators + - and * e.g.: "lable+1" or "$+3-2" (No brackets, everything is calculated from left to right)
 
 just run `python asm.py test.asm test.bin` to assemble and run `snailcpu test.bin` to execute.
