@@ -7,7 +7,7 @@ A simple assembler for my snailCPU16
 ENTRY_POINT = 0x100
 
 DEBUG=False
-#DEBUG=True
+DEBUG=True
 
 
 
@@ -30,7 +30,7 @@ def output(x):
     outindex += 1
 
 #Handle a single arg (starts at postion index and ends with ',', '#', or with the end of the list
-def handleArg(index, tokens):
+def handleArg(index, tokens, line_nr):
     arg = []
     loop=True
     while index<len(tokens) and loop:
@@ -41,20 +41,20 @@ def handleArg(index, tokens):
         else:
             arg.append(tokens[index])
         index+=1 
-    offsets.append([outindex,arg])
+    offsets.append([outindex,arg,line_nr])
     output(12345)
     return index
 
 #output the command and handle both arguments
-def command(x, tokens):
+def command(x, tokens, line_nr):
     global dollarsign
     global outindex
     global token_index
     dollarsign = outindex # save the address of the beginning of this line (needed for the $)
     output(x)
     token_index=1; #index used for evaluating args, 0 is the command, 1 is the first arg
-    token_index=handleArg(token_index, tokens)
-    handleArg(token_index, tokens)
+    token_index=handleArg(token_index, tokens, line_nr)
+    handleArg(token_index, tokens, line_nr)
 
 
 
@@ -79,7 +79,12 @@ for line in lines:
     line_nr+=1
 
     #Convert the lines to tokens
-    tokens = line.replace("\n","").replace(","," , ").replace("+"," + ").replace("-"," - ").replace("*"," * ").replace("!"," # ").replace("#"," # ").replace("//"," # ").split();
+    #tokens = line.replace("\n","").replace(","," , ").replace("+"," + ").replace("-"," - ").replace("*"," * ").replace("!"," # ").replace("#"," # ").replace("//"," # ").split();
+    tokens = line.replace("\n","").replace(","," , ").replace("+"," + ").replace("-"," - ").\
+            replace("*"," * ").replace("*  *","**").replace("/"," / ").replace("("," ( ").\
+            replace(")"," ) ").replace(">>"," >> ").replace("<<"," << ").replace("~"," ~ ").\
+            replace("^"," ^ ").replace("|"," | ").replace("&"," & ").\
+            replace("!"," # ").replace("#"," # ").replace("//"," # ").split();
 
     #Ignore blank lines
     if(len(tokens)==0):
@@ -141,21 +146,21 @@ for line in lines:
     elif tokens[0]==".word":
         dollarsign = outindex # save the address of the beginning of this line (needed for the $)
         token_index=1; #index used for evaluating args, 0 is the '.word', 1 is the first part of the value
-        handleArg(token_index, tokens)
+        handleArg(token_index, tokens, line_nr)
 
     #Handle the commands
     elif  tokens[0]=="mov":
-        command(0,tokens)
+        command(0,tokens,line_nr)
     elif  tokens[0]=="add":
-        command(1,tokens)
+        command(1,tokens,line_nr)
     elif  tokens[0]=="xor":
-        command(2,tokens)
+        command(2,tokens,line_nr)
     elif  tokens[0]=="and":
-        command(3,tokens)
+        command(3,tokens,line_nr)
     elif  tokens[0]=="sft" or tokens[0]=="shift":
-        command(4,tokens)
+        command(4,tokens,line_nr)
     elif  tokens[0]=="mif":
-        command(5,tokens)
+        command(5,tokens,line_nr)
 
     # Handle lables
     elif tokens[0][len(tokens[0])-1]==":":
@@ -173,52 +178,64 @@ if(DEBUG):
 
 # 2nd step: replace the offsets
 for entry in offsets:
-    if(DEBUG):
-        print(entry)
+    #if(DEBUG):
+    #    print(entry)
     i = 0 #tokenindex
     address = entry[0] # The address to replace
     tokens  = entry[1] # The tokens for this address
-    value   = 0        # The value
-    mode    = "add"
+    line_nr = entry[2]
+    #value   = 0        # The value
+    expr = ""
+    #mode    = "add"
     while i<len(tokens):
-        if tokens[i]=="+":
-            mode="add"
-            if(DEBUG):
-                print("Token add")
-        elif tokens[i]=="*":
-            mode="mul"
-            if(DEBUG):
-                print("Token mul")
-        elif tokens[i]=="-":
-            mode="sub"
-            if(DEBUG):
-                print("Token sub")
-        elif tokens[i] in equs:
-            if(DEBUG):
-                print(f"Token {tokens[i]} is in equs")
-            if mode=="mul":
-                value *= equs[tokens[i]]
-            elif mode=="sub":
-                value -= equs[tokens[i]]
-            else:
-                value += equs[tokens[i]]
+        #if tokens[i]=="+":
+        #    mode="add"
+        #    if(DEBUG):
+        #        print("Token add")
+        #elif tokens[i]=="*":
+        #    mode="mul"
+        #    if(DEBUG):
+        #        print("Token mul")
+        #elif tokens[i]=="-":
+        #    mode="sub"
+        #    if(DEBUG):
+        #        print("Token sub")
+        if tokens[i] in equs:
+            expr += str(equs[tokens[i]])
+            #if(DEBUG):
+            #    print(f"Token {tokens[i]} is in equs")
+            #if mode=="mul":
+            #    value *= equs[tokens[i]]
+            #elif mode=="sub":
+            #    value -= equs[tokens[i]]
+            #else:
+            #    value += equs[tokens[i]]
         else: #Token must be a number
-            try:
-                thisvalue = int(tokens[i],0)
-                if(DEBUG):
-                    print(f"Token {tokens[i]} is a number (converted from string)")
-            except:
-                thisvalue = 0;
-                print(f"Error near line {int(address/3)}: Token '{tokens[i]}' is not a valid number!")
-            if mode=="mul":
-                value *= thisvalue
-            elif mode=="sub":
-                value -= thisvalue
-            else:
-                value += thisvalue
+            expr += tokens[i]
+            #try:
+            #    thisvalue = int(tokens[i],0)
+            #    if(DEBUG):
+            #        print(f"Token {tokens[i]} is a number (converted from string)")
+            #except:
+            #    thisvalue = 0;
+            #    print(f"Error near line {int(address/3)}: Token '{tokens[i]}' is not a valid number!")
+            #if mode=="mul":
+            #    value *= thisvalue
+            #elif mode=="sub":
+            #    value -= thisvalue
+            #else:
+            #    value += thisvalue
         i+=1
+    try:
+        value = eval(expr)
+    except:
+        if(expr!=''):
+            print(f"Error in line {line_nr}: Can't evaluate '{expr}'")
+        value = 0
     if(DEBUG):
-        print(f"The offset at {address} was evaluated to {value}")
+        #print(f"The offset at {address} in line {line_nr} was evaluated to {expr}={value}")
+        #print( "@%04X%05d  %s=%d" % address %line_nr %expr %value )
+        print( "%4d %04X  %9s=%3d\t%s" % (line_nr, address, expr, value, str(tokens)) )
     outlist[address] = value
 
 if(DEBUG):
@@ -237,8 +254,8 @@ if(DEBUG):
 for i in outlist:
     low  =  i     & 0xff
     high = (i>>8) & 0xff
-    if(DEBUG):
-        print("%04X %02X %02X" % (i,high,low))
+    #if(DEBUG):
+    #    print("%04X %02X %02X" % (i,high,low))
     outfile.write(bytes([high]))
     outfile.write(bytes([low]))
 
