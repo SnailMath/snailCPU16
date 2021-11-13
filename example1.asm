@@ -1,5 +1,6 @@
 .equ jump 0x0000 #The pc aka program couner, move to this register to jump
 .equ out  0x0001
+.equ in   0x0001
 .equ exit 0x0003
 .equ sp   0x00FF
 #Registers that you don't need to preserve during subroutine calls
@@ -28,7 +29,6 @@ main:
 	mov $+6,	#move the return address onto the stack
 	mov print,jump	#jump into the subroutine
 	.word $+1	#the acatual return address
-
 
     #####################
     # F i b o n a c c i #
@@ -59,7 +59,13 @@ loop:			#r7 = sum
 break1:
 	.word $+1
 
+    #############
+    # I n p u t #
+    #############
 
+	mov in,out
+	mov in,out
+	mov in,out
 
 	#exit
 	mov ,exit

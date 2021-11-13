@@ -106,4 +106,4 @@ The assembler is a python script that converts assembly files into machine code.
 	- a constant, lable or a '$' (current location)
 	- a calculation using numbers and lables with all operators that python understands `( ) + - * / ** << >> ~ ^ | &` e.g.: "lable+1" or "$+(3-2)"
 
-just run `python asm.py test.asm test.bin` to assemble and run `snailcpu test.bin` to execute.
+just run `python asm.py test.asm -o test.bin` to assemble and run `snailcpu test.bin` to execute. (You can use multiple input filenames to split projects into multiple files)

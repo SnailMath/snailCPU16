@@ -27,6 +27,8 @@ public:
 	bool flag = false;
 	bool running = true;
 	uint16_t memory[RAM_SIZE];
+	int inbuf_index;
+	char inbuf[528];
 	void init(){
 		//clear the ram
 		for(int i=0;i<0x4000;i++)
@@ -34,6 +36,9 @@ public:
 		//The start address
 		pc = PROG_START; 
 		flag = false;
+		//set up input buffer
+		inbuf_index = 0;
+		inbuf[0]=0;
 	}
 	void load(const char* filename, int mode){ //load from a file, mode 0 big endian, mode 1 little endian
 		FILE *fp = fopen(filename, "rb");
@@ -55,8 +60,8 @@ public:
 		}
 #ifdef DEBUG
 		print("\n");
-#endif
 		printf("Loaded %d words from 0x%04X to 0x%04X\n", (int)index-PROG_START, PROG_START, (unsigned int)index);
+#endif
 		fclose(fp);
 	}
 	void write(uint16_t address, uint16_t val){
@@ -88,7 +93,12 @@ public:
 #endif
 				return pc;
 			case ADDR_PORT:
-				
+				if (inbuf[inbuf_index]==0){ //if there inbuf is used up or empty
+					printf(">");
+					fgets(inbuf, sizeof(inbuf), stdin);
+					inbuf_index = 0;
+				}
+				return inbuf[inbuf_index++];
 			break;
 		}	
 #ifdef DEBUG

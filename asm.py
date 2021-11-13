@@ -7,7 +7,7 @@ A simple assembler for my snailCPU16
 ENTRY_POINT = 0x100
 
 DEBUG=False
-#DEBUG=True
+DEBUG=True
 
 
 
@@ -60,18 +60,49 @@ def command(x, tokens, line_nr):
 
 ####### M A I N #######
 
-#Check if the number of args is correct
-if len(sys.argv)!=3:
-    print("Usage: python asm.py input.asm output.bin")
-    exit();
+#Evaluate commandline arguments
+in_filenames=[]
+out_filename=""
+arg_mode="in" #if we're reading input or output filenames
+i=1
+while i<len(sys.argv):
+    if DEBUG:
+        print(f"reading arg {sys.argv[i]}")
+    if arg_mode=="out": #if we're reading an output filenme
+        if out_filename:
+            print("Warning: Two output filenames given, using the last one.")
+        out_filename=sys.argv[i]
+        if DEBUG:
+            print(f"out_filename: {out_filename}")
+        arg_mode="in" #exit the output-filename-read-mode
+    elif sys.argv[i]=="-o":
+        arg_mode="out" #go into output-filemame-read-mode
+    else:
+        in_filenames.append(sys.argv[i])
+        if DEBUG:
+            print(f"in_filenames: {in_filenames}")
+    i+=1
 
-#Read the lines from the input file
-try:
-    with open(sys.argv[1]) as f:
-        lines = f.readlines()
-except:
-    print(f"Error: Can't open file '{sys.argv[1]}' for reading.")
+#Check if input filenames are given
+if len(in_filenames)==0:
+    print("Error! No input filenames given")
     exit()
+
+#Check if output filename is given
+if not out_filename:
+    out_filename = in_filenames[0] + '.bin'
+
+# Go through all input files
+lines = []
+for this_infile in in_filenames:
+
+    #Read the lines from the input file
+    try:
+        with open(this_infile) as f:
+            lines += f.readlines()
+    except:
+        print(f"Error: Can't open file '{sys.argv[1]}' for reading.")
+        exit()
 
 #1st step: Go through each line
 line_nr = 0
@@ -243,7 +274,7 @@ if(DEBUG):
 
 #save to the file
 try:
-    outfile =open(sys.argv[2],"wb") #write to the file in binary
+    outfile =open(out_filename,"wb") #write to the file in binary
 except:
     print(f"Error: Can't open file '{sys.argv[2]}' for writing.")
     exit()
