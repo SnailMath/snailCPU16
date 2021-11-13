@@ -7,7 +7,7 @@ A simple assembler for my snailCPU16
 ENTRY_POINT = 0x100
 
 DEBUG=False
-DEBUG=True
+#DEBUG=True
 
 
 
