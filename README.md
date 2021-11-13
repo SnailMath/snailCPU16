@@ -17,7 +17,7 @@ SnailCPU16 is a concept of a virtual processor by ThatLolaSnail / SnailMath.
 | 0x0100 | 0x3FFF | Intended for code and also variables. |
 
 The stack could start at 0x3FFF and go down (sp is intialized to 4000, so when something is pushed, it gets first decremented and is 0x3FFF, 0x3FFE and so on...
-Or initialize the stack pointer to 3F00 and use 3F00 to 3FFF (256 words) for constants and global values.
+The area below 0x100 is usually used as general purpose registers and the area from 0x100 us used for the program and for constant values.
 You'll need global values, because there is no direct add or mov, you'll have to put values like 1 and -1 here...
 
 ## Instructions:
@@ -36,49 +36,60 @@ Everything should work with these instructions.
 
 ### Use the stack
 
+To use the stack, you need to initialize the stack pointer first.
+```
+0100   0000 2000 00FF	mov initsp,sp	//initialize the stack pointer
+
+initsp:
+2000   4000		.word 0x4000
+```
 ```
 push x:
-0100   0001 3FFF 00FF   add cm1, SP	//pull down the stack pointer (using the consstant 'Constant Minus One' -1)
-0103   0000 00FF 0108   mov SP , $ +5	//put the stack address at offset 5 from the curren location, the destination of the next mov
-0106   0000 xxxx FFFF   mov x  , -1	//The destination is overvritten by the last instruction
+0110   0001 2002 00FF   add n1, SP	//pull down the stack pointer (using the consstant 'Constant Negative One' -1)
+0113   0000 00FF 0118   mov SP , $+5	//put the stack address at offset 5 from the curren location, the destination of the next mov
+0116   0000 xxxx 0000   mov x,		//The destination is overvritten by the last instruction
 
 pop x:
-0110   0000 00FF 0114   mov SP , $ +4	//put this at offset 4 from the curren location, the source of the next mov
-0113   0000 xxxx FFFF   mov -1 , x	//The source is overvritten by the last instruction
-0116   0001 3FFE 00FF   add cp1, SP	//push the stack pointer back up (using the consstant 'Constant Plus One' +1)
+0120   0000 00FF 0124   mov SP, $+4	//put this at offset 4 from the curren location, the source of the next mov
+0123   0000 0000 xxxx   mov ,x		//The source is overvritten by the last instruction
+0126   0001 2001 00FF   add p1, SP	//push the stack pointer back up (using the consstant 'Constant Plus One' +1)
 
 constants:
-cp1: # ConstantPlusOne
-3FFE   0001             .word +1
-cm1: # ConstantMinusOne
-3FFF   FFFF             .word -1
+p1: # Constant PlusOne
+2001   0001             .word +1
+n1: # Constant NegativeOne
+2002   FFFF             .word -1
 ```
 
 ### call subroutines
 
 ```
 call x: //call the subroutine at x
-0120   0001 3FFF 00FF   add cm1, SP	 //pull down the stack pointer (using the consstant 'Constant Minus One' -1)
-0123   0000 00FF 0128   mov SP , $ +5	 //put the stack address at offset 5 from the current location
-0126   0000 012D FFFF   mov retadrr, -1 //put the returnaddress on the stack (remember the -1 was overritten)
-0129   0000 012C 0000   mov x, PC	 //put the subroutine address (from 012D) into the program counter (jump)
-012C   xxxx 012E  //the subroutine address and the return address ist written here, because we don't have a move immidiate instruction.
-012E   continue execution after subroutine here...
+0130   0001 2002 00FF   add n1, SP	//pull down the stack pointer (using the consstant 'Constant Minus One' -1)
+0133   0000 00FF 0128   mov SP, $+5	//put the stack address at offset 5 from the current location
+0136   0000 013C 0000   mov $+6,	//put the returnaddress on the stack (remember the 0 was overritten)
+0139   0000 xxxx 0000   mov x, PC	//put the subroutine address into the program counter(jump)(This is actually the addresses address, which is one byte before the subroutine)
+013C   013D  		.word $+1	//the return address ist written here, because we don't have a move immidiate instruction.
+013D   continue execution after subroutine here...
+
+//The subroutine:
+0140   0141		.word $+1	//the actual address where the actual code begins
+0141   0000 0000 0000	some code	//(the code 0000 0000 0000 is a nop instruction)
 
 return: //return from the subroutine
-0130   0000 00FF 0137   mov SP , $ +7	//put the stack pointer in the 2nd next instruction as a source
-0133   0001 3FFE 00FF   add cp1, SP	//put the stack pointer back up (the actual pop) (using the constant 'Constant Plus One' +1)
-0136   0000 FFFF 0000   mov -1 , PC	//jump back (return) using the address, that's still there, we put the address of the address here 2 lines ago. 
+0144   0000 00FF 014B	mov SP, $+7	//put the stack pointer in the 2nd next instruction as a source
+0147   0001 2001 00FF	add p1, SP	//put the stack pointer back up (the actual pop) (using the constant 'Constant Plus One' +1)
+014A   0000 0000 0000	mov ,PC		//jump back (return) using the address, that's still there, we put the address of the address here 2 lines ago. 
 ```
 
 ### subtract
 
 ```
 sub x-y => z : //subtract y from x and save in z
-0140   0000 yyyy zzzz	mov y  , z	// create the 2's complement of y in z
-0143   0002 FFFF zzzz	xor cm1, z	// (first invert)
-0146   0001 FFFE zzzz	add cp1, z	// (then add 1), now z contains -y
-0149   0001 xxxx zzzz	add x  , z	// now add x, z now contains x-y
+0150   0000 yyyy zzzz	mov y  , z	// create the 2's complement of y in z
+0153   0002 FFFF zzzz	xor cm1, z	// (first invert)
+0156   0001 FFFE zzzz	add cp1, z	// (then add 1), now z contains -y
+0159   0001 xxxx zzzz	add x  , z	// now add x, z now contains x-y
 ```
 
 ## Assembler

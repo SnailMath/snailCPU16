@@ -44,7 +44,7 @@ loop:			#r7 = sum
 	#break if overflow
 	mif break1,jump
 	#print_int_ln(r5)
-	mov r5,r1
+	mov r6,r1
 	add n1,sp
 	mov sp,$+5
 	mov $+6,
@@ -68,7 +68,7 @@ break1:
 
 text1:
 	.word $+1
-	.string "Hello World!\n"
+	.string "Hello World!\n00001\n00001\n"
 
 
 print: #print string from r1
