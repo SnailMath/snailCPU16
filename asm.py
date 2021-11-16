@@ -7,7 +7,7 @@ A simple assembler for my snailCPU16
 ENTRY_POINT = 0x100
 
 DEBUG=False
-DEBUG=True
+#DEBUG=True
 
 
 
@@ -32,18 +32,18 @@ def output(x):
 #Handle a single arg (starts at postion index and ends with ',', '#', or with the end of the list
 def handleArg(index, tokens, line_nr):
     arg = []
-    loop=True
-    while index<len(tokens) and loop:
-        if tokens[index]=="," or tokens[index]=="#":
-            loop=False
-        elif tokens[index]=="$":
+    newindex=index
+    for thistoken in tokens[index:]:
+        newindex+=1 
+        if thistoken=="," or thistoken=="#":
+            break
+        elif thistoken=="$":
             arg.append(str(dollarsign+ENTRY_POINT))
         else:
-            arg.append(tokens[index])
-        index+=1 
+            arg.append(thistoken)
     offsets.append([outindex,arg,line_nr])
     output(12345)
-    return index
+    return newindex
 
 #output the command and handle both arguments
 def command(x, tokens, line_nr):
@@ -65,20 +65,20 @@ in_filenames=[]
 out_filename=""
 arg_mode="in" #if we're reading input or output filenames
 i=1
-while i<len(sys.argv):
+for thisarg in sys.argv[1:]:
     if DEBUG:
-        print(f"reading arg {sys.argv[i]}")
+        print(f"reading arg {thisarg}")
     if arg_mode=="out": #if we're reading an output filenme
         if out_filename:
             print("Warning: Two output filenames given, using the last one.")
-        out_filename=sys.argv[i]
+        out_filename=thisarg
         if DEBUG:
             print(f"out_filename: {out_filename}")
         arg_mode="in" #exit the output-filename-read-mode
-    elif sys.argv[i]=="-o":
+    elif thisarg=="-o":
         arg_mode="out" #go into output-filemame-read-mode
     else:
-        in_filenames.append(sys.argv[i])
+        in_filenames.append(thisarg)
         if DEBUG:
             print(f"in_filenames: {in_filenames}")
     i+=1
@@ -101,7 +101,7 @@ for this_infile in in_filenames:
         with open(this_infile) as f:
             lines += f.readlines()
     except:
-        print(f"Error: Can't open file '{sys.argv[1]}' for reading.")
+        print(f"Error: Can't open file '{this_infile}' for reading.")
         exit()
 
 #1st step: Go through each line
@@ -127,13 +127,13 @@ for line in lines:
     #save .equs
     elif tokens[0]==".equ":
         if(len(tokens)>=3):
+            value = 0
             if tokens[1] in equs:
                 print(f"Error in line {line_nr}: Multiple occurrances of lable or .equ \"{tokens[1]}\"")
             try:
                 value = int(tokens[2],0)
             except:
                 print(f"Error in line {line_nr}: '{tokens[2]}' is not a valid number. (Note: don't use lables or equs here.)")
-                value = 0
             equs[tokens[1]]=value
             if(len(tokens)>3):
                 if tokens[3]!="#":
@@ -218,7 +218,7 @@ for entry in offsets:
     #value   = 0        # The value
     expr = ""
     #mode    = "add"
-    while i<len(tokens):
+    for i in range(len(tokens)):
         #if tokens[i]=="+":
         #    mode="add"
         #    if(DEBUG):
