@@ -1,0 +1,9 @@
+# Windows temp files
+*~
+.*~
+
+# compiled files
+*.bin
+
+# backups
+*_back*
