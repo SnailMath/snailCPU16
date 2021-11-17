@@ -4,7 +4,7 @@ mov main,jump #Jump to the main.
 
 #inputs are r1, r2, ...
 #output is r1
-#r1 to r4 can be used
+#r1 to r7 can be used
 
 subtract:
 	.word $+1

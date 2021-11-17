@@ -27,11 +27,11 @@ print: #print string from r1
 	mov   , 0    # jump back
 
 
-#########################
-### P R I N T _ I N T ###
-#########################
+###########################
+### P R I N T _ U I N T ###
+###########################
 	
-print_int: #print int from r1
+print_uint: #print int from r1
 	.word $+1
 	#print 10_000th place
 	mov ascnum, r2 	# don't set this to 0, set this digit to '0'-1 instead, so we don't have to subtract 1 and add '0' later
@@ -76,35 +76,79 @@ prir1:
 
 
 ###############################
+### P R I N T _ U I N T _ L N ###
+###############################
+
+print_uint_ln:
+	.word $+1
+	#call print_uint(r1)
+	add n1, sp
+	mov sp, $+5
+	mov $+6,
+	mov print_uint,jump
+	.word $+1
+	#print newline character
+	mov p1e1, out #reuse the 10 from the print_uint subroutine as the \n, which is also 10
+	#return
+	mov sp, $+7
+	add p1, sp
+	mov   , 0
+
+###############################
 ### P R I N T _ I N T _ L N ###
 ###############################
 
 print_int_ln:
 	.word $+1
-	#call print_int(r1)
-	add n1, sp
-	mov sp, $+5
-	mov $+6,
-	mov print_int,jump
+	mov r1,r2
+	sft p1,r2 #get the highest bit of the number
+	mif pilnegativ,jump
+	#positiv
+		mov plus,out
+		mov print_uint_ln,jump
+	#negariv
+pilnegativ:
 	.word $+1
-	#print newline character
-	mov p1e1, out #reuse the 10 from the print_int subroutine as the \n, which is also 10
-	#return
-	mov sp, $+7
-	add p1, sp
-	mov   , 0
+		mov minus,out
+		xor n1,r1
+		add p1,r1
+		mov print_uint_ln,jump
+
+#########################
+### P R I N T _ I N T ###
+#########################
+print_int:
+	.word $+1
+	mov r1,r2
+	sft p1,r2 #get the highest bit of the number
+	mif pinegativ,jump
+	#positiv
+		mov plus,out
+		mov print_int,jump
+	#negariv
+pinegativ:
+	.word $+1
+		mov minus,out
+		xor n1,r1
+		add p1,r1
+		mov print_int,jump
 
 
 #########################
 ### C o n s t a n t s ###
 #########################
 
+plus:
+	.word ord('+')
+minus:
+	.word ord('-')
+
 ascnum:
 	.word ord('0')-1 #This value is needed for the ascii conversion. It simultaniously adds '0' and subracts 1, it is used when we counted one too high
 ascnum2:
 	.word ord('0') #This is needed for the last digit, this makes a lot easier.
 
-#The jump addresses inside the print_int and the powers of 10
+#The jump addresses inside the print_uint and the powers of 10
 prir4a:
 	.word prir4
 n1e4:

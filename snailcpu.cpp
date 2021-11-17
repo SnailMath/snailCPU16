@@ -68,6 +68,12 @@ public:
 #ifdef DEBUG
 		printf("Write %d to %04X\n", val, address);
 #endif
+		if(address>=RAM_SIZE){
+			printf("ERROR: Address %04X is outside the RAM!\n", address);
+			return;
+
+		}
+
 		memory[address] = val;
 		if(address<0x100)switch(address){
 			case ADDR_PC: //change the pc (aka jump)
@@ -101,6 +107,12 @@ public:
 				return inbuf[inbuf_index++];
 			break;
 		}	
+
+		if(address>=RAM_SIZE){
+			printf("ERROR: Address %04X is outside the RAM!\n", address);
+			return 0;
+		}
+
 #ifdef DEBUG
 		printf("Read %d from %04X\n", memory[address], address);
 #endif

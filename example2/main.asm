@@ -30,21 +30,45 @@ main:
 	#initialize stack pointer
 	mov defaultsp, sp
 
-    ###########################
-    # H e l l o   W o r l d ! #
-    ###########################
+    ##########
+    # Print1 #
+    ##########
 
-	##call print(text1)
-	#mov text1, r1	#move char pointer into r1
-	#add n1, sp	#add stack element
-	#mov sp, $+5	#prepare the next mov
-	#mov $+6,	#move the return address onto the stack
-	#mov print,jump	#jump into the subroutine
-	#.word $+1	#the acatual return address
+	#call print(text1)
+	mov text1, r1	#move char pointer into r1
+	add n1, sp	#add stack element
+	mov sp, $+5	#prepare the next mov
+	mov $+6,	#move the return address onto the stack
+	mov print,jump	#jump into the subroutine
+	.word $+1	#the acatual return address
+	
+	#print num1
+	mov num1,r1
+	add n1, sp
+	mov sp, $+5
+	mov $+6,
+	mov print_int_ln,jump
+	.word $+1
+
+	#print num2
+	mov num2,r1
+	add n1, sp
+	mov sp, $+5
+	mov $+6,
+	mov print_int_ln,jump
+	.word $+1
 
     ###################
     # S u b t r a c t #
     ###################
+	#call print()
+	mov textdiff,r1
+	add n1, sp
+	mov sp, $+5
+	mov $+6,
+	mov print,jump
+	.word $+1	
+
 	mov num1, r1
 	mov num2, r2
 	add n1, sp
@@ -62,6 +86,14 @@ main:
     ###################
     # M u l t i p l y #
     ###################
+	#call print()
+	mov textprod,r1
+	add n1, sp
+	mov sp, $+5
+	mov $+6,
+	mov print,jump
+	.word $+1	
+
 	mov num1, r1
 	mov num2, r2
 	add n1, sp
@@ -79,6 +111,14 @@ main:
     ###############
     # D i v i d e #
     ###############
+	#call print()
+	mov textquot,r1
+	add n1, sp
+	mov sp, $+5
+	mov $+6,
+	mov print,jump
+	.word $+1	
+
 	mov num1, r1
 	mov num2, r2
 	add n1, sp
@@ -102,51 +142,35 @@ main:
 	mov print_int_ln,jump
 	.word $+1
 
-#    #####################
-#    # F i b o n a c c i #
-#    #####################
-#
-#	#init variables
-#	mov p1, r5	#r5 = first number
-#	mov p1, r6	#r6 = second number
-#loop:			#r7 = sum
-#	#add r5+r6=>r7
-#	mov r5,r7
-#	add r6,r7
-#	#break if overflow
-#	mif break1,jump
-#	#print_int_ln(r5)
-#	mov r6,r1
-#	add n1,sp
-#	mov sp,$+5
-#	mov $+6,
-#	mov print_int_ln,jump
-#	.word $+1
-#	#move all values one place down
-#	mov r6,r5
-#	mov r7,r6
-#	#jump back up
-#	mov $+3,jump
-#	.word loop
-#break1:
-#	.word $+1
-
-
 
 	#exit
 	mov ,exit
 
 num1:
-	.word 1234
-	#.word 400
+	#.word 1234
+	.word -39
 num2:
-	.word 23
-	#.word 2
+	#.word 23
+	.word 3
 
 
 text1:
 	.word $+1
-	.string "Hello World!\n00001\n00001\n"
+	.string "Doing some Math with these two numbes:\n"
+textsum:
+	.word $+1
+	.string "Sum:\n"
+
+textdiff:
+	.word $+1
+	.string "Difference:\n"
+textprod:
+	.word $+1
+	.string "Product:\n"
+textquot:
+	.word $+1
+	.string "Quotient (with rest):\n"
+
 
 
 defaultsp: #the default value for the stack pointer
